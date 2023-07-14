@@ -34,8 +34,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @Column(name = "userId")
+
+
     /**가입 이메일*/
+    @Column(name = "userId")
     private @NotNull @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,6}$") String email;
     /**비번*/
     private String password;
@@ -50,8 +52,15 @@ public class User {
     private String social;
     /**권한*/
     private @NotNull String roles;
-
-
+    /**작성 게실글목록*/
+    @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
+    private List<Board> boards;
+    /**실시간채팅*/
+    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    private List<chat> chatList;
+    /**댓글 리스트*/
+    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    private List<Reply> replyList;
     @PrePersist
     public void prePersist() {
         this.joinDate = LocalDateTime.now();

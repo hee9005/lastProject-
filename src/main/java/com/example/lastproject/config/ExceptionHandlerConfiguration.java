@@ -9,6 +9,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.lastproject.exception.AlreadyVerifedException;
 import com.example.lastproject.exception.ExistUserEmailException;
+import com.example.lastproject.exception.ReplyUserdException;
 import com.example.lastproject.exception.verifyCodeException;
 import com.example.lastproject.model.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,11 @@ public class ExceptionHandlerConfiguration {
     @ExceptionHandler({ExistUserEmailException.class})
     public ResponseEntity<Void> exceptionHandle(ExistUserEmailException ex) {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ReplyUserdException.class})
+    public ResponseEntity<ErrorResponse> exceptionHandle(ReplyUserdException ex){
+        ErrorResponse response = new ErrorResponse(400, ex.getMessage(), System.currentTimeMillis());
+        return  new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
     }
 }
