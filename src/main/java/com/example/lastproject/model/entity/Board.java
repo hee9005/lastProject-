@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "boatds")
+@Table(name = "boards")
 @Setter
 @Getter
 @AllArgsConstructor
@@ -41,26 +42,36 @@ public class Board {
     private @NotNull String postTitle;
     /**게시글내용*/
     private String description;
+    
+    @NotNull
+    /**게시판 열람등급*/
+    private String boardRoles;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne()
     /**게시글 작성자id*/
-    @JoinColumn(name = "Writer")
-    private @NotNull User Writer;
+    @JoinColumn(name = "writer")
+    @NotNull
+    private  User writer;
+    @NotNull
     /**게시글 작성날짜*/
     private LocalDateTime boardDate;
     /**게시글 이미지*/
-    @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY)
-    private List<BoardImg> boardImg = new ArrayList();
+    @OneToMany(mappedBy = "boardId")
+    private List<BoardImg> boardImg;
+
     /**댓글*/
-    @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "boardId")
     private List<Reply> replyList;
+
     /**추천*/
-    @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "boardId")
     private List<BoardGood> boardGoods;
 
     @PrePersist
     public void prePersist() {
         this.boardDate = LocalDateTime.now();
     }
+
 
 }

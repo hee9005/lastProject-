@@ -32,7 +32,7 @@ public class SecurityConfiguration {
         // 경로에 따른 인증이 필요한가.. 아닌가 설정 하는 작업
         http.authorizeHttpRequests(t -> t //
                 .requestMatchers("/user/private/**").authenticated() //
-                .requestMatchers(HttpMethod.POST,"/board/private/create").authenticated()
+                .requestMatchers("/board/private/**").authenticated()
                 .anyRequest().permitAll());
 
 

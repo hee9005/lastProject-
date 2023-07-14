@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class BoardRequest {
     private String category;
+    private String boardRoles;
     private String postTitle;
     private String description;
     private List<MultipartFile> arraches;

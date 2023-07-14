@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,30 +14,40 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Table(name = "replts")
+@Table(name = "replys")
 @Entity
-@Setter
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     /**게시판 id*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardId")
     private Board boardId;
     /**댓글 내용*/
     private String comment;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     /**댓글 작성자*/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userid")
     private User userId;
+
+
+
+
+    public void Reply(Reply reply) {
+        this.boardId= reply.getBoardId();
+        this.userId= reply.getUserId();
+        this.comment = reply.getComment();
+        this.id = reply.getId();
+    }
+
 
 }

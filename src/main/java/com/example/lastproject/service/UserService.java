@@ -15,11 +15,10 @@ import com.example.lastproject.model.dto.request.joinRequest;
 import com.example.lastproject.model.dto.request.loginRequest;
 import com.example.lastproject.model.dto.request.passwordRequest;
 import com.example.lastproject.model.dto.response.VerificationCodeResponseDate;
+import com.example.lastproject.model.entity.Board;
 import com.example.lastproject.model.entity.User;
 import com.example.lastproject.model.entity.VerificationCode;
-import com.example.lastproject.repository.BoardRepository;
-import com.example.lastproject.repository.UserRepository;
-import com.example.lastproject.repository.VerificationCodeRepository;
+import com.example.lastproject.repository.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.time.ZoneId;
@@ -35,6 +34,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
@@ -45,6 +45,12 @@ public class UserService {
     JavaMailSender javaMailSender;
     @Autowired
     VerificationCodeRepository verificationCodeRepository;
+
+    @Autowired
+    ReplyRepository replyRepository;
+
+    @Autowired
+    BoardImgRepository boardImgRepository;
 
     @Autowired
     BoardRepository boardRepository;
@@ -115,7 +121,9 @@ public class UserService {
     /**로그인*/
     @Transactional
     public void loginHandle(loginRequest req) throws verifyCodeException {
+        log.warn(req.getEmail());
         User user =userRepository.findByEmail(req.getEmail());
+        log.warn(user.getPassword());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new verifyCodeException("비밀번호가 잘못 입력되었습니다.");
@@ -129,7 +137,12 @@ public class UserService {
         log.warn("userEmail" + user.getEmail());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-            log.info("======================="+user.getId());
+           var board=boardRepository.findByWriter(user);
+            for (Board boards : board) {
+                replyRepository.deleteAllByBoardId(boards);
+                boardImgRepository.deleteAllByboardId(boards);
+                boardRepository.deleteById(boards.getId());
+            }
           userRepository.deleteByEmail(user.getEmail());
           verificationCodeRepository.deleteByEmail(user.getEmail());
         } else {
