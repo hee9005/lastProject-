@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**유저 생성*/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -18,7 +18,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
 
     long countByCategory(String req);
 
-    Optional<Board> findById(Integer boardId);
+//    Optional<Board> findById(Integer boardId);
 
     List<Board> findByWriter(User Writer);
 

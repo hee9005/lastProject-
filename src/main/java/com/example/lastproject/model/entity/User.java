@@ -48,19 +48,25 @@ public class User {
 
     /**가입 날짜*/
     private @NotNull LocalDateTime joinDate;
+
     /**소셜*/
     private String social;
+
     /**권한*/
     private @NotNull String roles;
+
     /**작성 게실글목록*/
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
     private List<Board> boards;
+
     /**실시간채팅*/
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
     private List<chat> chatList;
+
     /**댓글 리스트*/
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
     private List<Reply> replyList;
+
     @PrePersist
     public void prePersist() {
         this.joinDate = LocalDateTime.now();

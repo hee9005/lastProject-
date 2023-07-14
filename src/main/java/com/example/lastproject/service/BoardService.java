@@ -6,7 +6,7 @@
 package com.example.lastproject.service;
 
 import com.example.lastproject.exception.verifyCodeException;
-import com.example.lastproject.model.dto.boardWrapper;
+import com.example.lastproject.model.dto.BoardDetaitWrapper;
 import com.example.lastproject.model.dto.boardsWrapper;
 import com.example.lastproject.model.dto.request.*;
 import com.example.lastproject.model.entity.Board;
@@ -52,7 +52,7 @@ public class BoardService {
 
     @Autowired
     ReplyRepository replyRepository;
-     /**게시글 작성*/
+    /**게시글 작성*/
     @Transactional
     public boolean createBoard(String principal, BoardRequest req) throws IOException {
         User user = userRepository.findByEmail(principal);
@@ -135,13 +135,13 @@ public class BoardService {
     /**게시글 삭제*/
     @Transactional
     public void boardDeleteHandle(String principal, passwordRequest pass,boardIdRequest req) {
-      var user = userRepository.findByEmail(principal);
+        var user = userRepository.findByEmail(principal);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (passwordEncoder.matches(pass.getPassword(), user.getPassword())) {
-        replyRepository.deleteAllByBoardId(req.getBoardId());
-        boardImgRepository.deleteAllByboardId(req.getBoardId());
+            replyRepository.deleteAllByBoardId(req.getBoardId());
+            boardImgRepository.deleteAllByboardId(req.getBoardId());
 
-        boardRepository.delete(req.getBoardId());
+            boardRepository.delete(req.getBoardId());
         }
 
     }
@@ -155,9 +155,9 @@ public class BoardService {
     /**전체 글 가져오기*/
     @Transactional
     public List<boardsWrapper> pageload(int page) {
-       List<Board> boardList = boardRepository.findAll(PageRequest.of(page-1,5)).toList();
+        List<Board> boardList = boardRepository.findAll(PageRequest.of(page-1,5)).toList();
 
-       return boardList.stream().map(board -> new boardsWrapper(board)).toList();
+        return boardList.stream().map(board -> new boardsWrapper(board)).toList();
     }
 
     /**특정카테고리 전체 가져오기*/
@@ -179,9 +179,11 @@ public class BoardService {
         return boardRepository.countByCategory(req.getCategory());
     }
 
-    /**특정권한 유저통과시키는 서비스*/
+    /**
+     * 특정권한 유저통과시키는 서비스
+     */
     @Transactional
-    public List<boardWrapper> detailPage(String principal, boardIdRequest req, List<Reply> replts) throws verifyCodeException {
+    public List<BoardDetaitWrapper> detailPage(String principal, boardIdRequest req, List<Reply> replts) throws verifyCodeException {
         User user = userRepository.findByEmail(principal);
         log.info("boardId = {}"+req);
         Optional<Board> board = boardRepository.findById(req.getBoardId().getId());
@@ -189,18 +191,18 @@ public class BoardService {
         board.get().setReplyList(replts);
         if (board.isPresent() && board.get().getBoardRoles().contains("basic")) {
             // basic 권한을 가진 게시판은 모든 사용자가 볼 수 있음
-            return board.stream().map(boards -> new boardWrapper(boards)).toList();
+            return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
         } else if (board.isPresent() && board.get().getBoardRoles().contains("middle")) {
             // middle 권한을 가진 게시판은 master 권한을 가진 유저 또는 middle 권한을 가진 유저만 볼 수 있음
             if (user.getRoles().contains("master") || user.getRoles().contains("middle")) {
-                return board.stream().map(boards -> new boardWrapper(boards)).toList();
+                return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
             } else {
                 throw new verifyCodeException("게시글을 볼 수 있는 권한이 없습니다.");
             }
         } else if (board.isPresent() && board.get().getBoardRoles().contains("master")) {
             // master 권한을 가진 게시판은 master 권한을 가진 유저만 볼 수 있음
             if (user.getRoles().contains("master")) {
-                return board.stream().map(boards -> new boardWrapper(boards)).toList();
+                return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
             } else {
                 throw new verifyCodeException("게시글을 볼 수 있는 권한이 없습니다.");
             }

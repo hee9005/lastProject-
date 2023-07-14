@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -58,9 +59,11 @@ public class Board {
     private LocalDateTime boardDate;
     /**게시글 이미지*/
     @OneToMany(mappedBy = "boardId")
+    @JsonIgnore
     private List<BoardImg> boardImg;
 
     /**댓글*/
+    @JsonIgnore
     @OneToMany(mappedBy = "boardId")
     private List<Reply> replyList;
 
