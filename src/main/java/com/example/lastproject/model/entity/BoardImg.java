@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,10 +29,13 @@ public class BoardImg {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     /**게시글 id*/
+    @JsonIgnoreProperties("boardId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardId")
     private Board boardId;
+
     /**이미지 타입*/
     private String type;
     /**이미지 저장 주소*/

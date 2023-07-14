@@ -3,21 +3,19 @@ package com.example.lastproject.model.dto;
 import com.example.lastproject.model.entity.Reply;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ReplyWrapper {
-    public ReplyWrapper(Reply e) {
-        this.Writer = String.valueOf(e.getUserId().getId());
-        this.boardId= String.valueOf(e.getBoardId().getId());
-        this.comment=e.getComment();
-        this.replyId = e.getId();
-    }
-
-    private  Integer replyId;
-    private String Writer;
-
-    private String boardId;
-
+    private Integer id;
     private String comment;
+    private UserWrapper user; // User 정보를 포함하는 래퍼 클래스
+
+    public ReplyWrapper(Reply reply) {
+        this.id = reply.getId();
+        this.comment = reply.getComment();
+        this.user = new UserWrapper(reply.getUserId()); // User 정보 래핑
+    }
 }

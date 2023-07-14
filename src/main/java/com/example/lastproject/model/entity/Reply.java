@@ -26,15 +26,17 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     /**게시판 id*/
+    @JsonIgnoreProperties("boardId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardId")
     private Board boardId;
+
     /**댓글 내용*/
     private String comment;
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
     /**댓글 작성자*/
+    @JsonIgnoreProperties("userId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid")
     private User userId;
