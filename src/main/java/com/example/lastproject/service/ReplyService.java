@@ -30,14 +30,14 @@ public class ReplyService {
     /**댓글작성 서비스*/
     public void replyCreate(boardIdRequest req, String principal, replyRequest replyReq) throws ReplyUserdException {
         var user = userRepository.findByEmail(principal);
-        log.warn(String.valueOf(req.getBoardId()));
+        log.warn("boasad=",String.valueOf(req.getBoardId()));
         var boar = boardRepository.findById(req.getBoardId()).orElseThrow(() -> new ReplyUserdException("삭제된 게시판입니다."));
         if(user != null && req != null){
             log.warn(String.valueOf(req.getBoardId()));
             Reply replys = new Reply();
             replys.setComment(replyReq.getComment());
             replys.setUserId(user);
-            replys.setBoardId(req.getBoardId());
+            replys.setBoardId(boar);
             replyRepository.save(replys);
         }
 

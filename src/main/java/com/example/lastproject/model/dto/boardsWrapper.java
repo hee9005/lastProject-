@@ -4,6 +4,7 @@ import com.example.lastproject.model.entity.Board;
 import com.example.lastproject.model.entity.User;
 import lombok.Data;
 
+/**게시판 글목록 가져오기*/
 @Data
 public class boardsWrapper {
     public boardsWrapper(Board board) {

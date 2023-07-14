@@ -6,7 +6,7 @@
 package com.example.lastproject.cotroller;
 
 import com.example.lastproject.exception.verifyCodeException;
-import com.example.lastproject.model.dto.boardWrapper;
+import com.example.lastproject.model.dto.BoardDetaitWrapper;
 import com.example.lastproject.model.dto.boardsWrapper;
 import com.example.lastproject.model.dto.request.*;
 import com.example.lastproject.model.dto.response.BoardListResponse;
@@ -79,7 +79,7 @@ public class BoardController {
     public ResponseEntity<?> derailPageHandle(@AuthenticationPrincipal String principal,boardIdRequest req) throws verifyCodeException {
         log.info("boardIdCon = {}"+req);
         List<Reply> replts = replyService.findbyReply(req);
-        List<boardWrapper> boardList =   boardService.detailPage(principal,req,replts);
+        List<BoardDetaitWrapper> boardList =   boardService.detailPage(principal,req,replts);
 
         return new ResponseEntity<>(boardList,HttpStatus.OK);
     }
