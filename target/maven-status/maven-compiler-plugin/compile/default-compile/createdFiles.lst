@@ -10,6 +10,7 @@ com\example\lastproject\config\OpenApiConfig.class
 com\example\lastproject\exception\notJoinUserException.class
 com\example\lastproject\exception\notCreateUserBoard.class
 com\example\lastproject\repository\VerificationCodeResponseDates.class
+com\example\lastproject\cotroller\index.class
 com\example\lastproject\model\dto\request\UserIdRequest.class
 com\example\lastproject\service\UserService.class
 com\example\lastproject\cotroller\NestedrReplyController.class
