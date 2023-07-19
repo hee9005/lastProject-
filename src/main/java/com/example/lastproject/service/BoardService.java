@@ -5,18 +5,16 @@
 
 package com.example.lastproject.service;
 
-import com.example.lastproject.exception.verifyCodeException;
+import com.example.lastproject.exception.*;
 import com.example.lastproject.model.dto.BoardDetaitWrapper;
 import com.example.lastproject.model.dto.boardsWrapper;
 import com.example.lastproject.model.dto.request.*;
+import com.example.lastproject.model.dto.response.passwordRequest;
 import com.example.lastproject.model.entity.Board;
 import com.example.lastproject.model.entity.BoardImg;
 import com.example.lastproject.model.entity.Reply;
 import com.example.lastproject.model.entity.User;
-import com.example.lastproject.repository.BoardImgRepository;
-import com.example.lastproject.repository.BoardRepository;
-import com.example.lastproject.repository.ReplyRepository;
-import com.example.lastproject.repository.UserRepository;
+import com.example.lastproject.repository.*;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,25 +43,33 @@ public class BoardService {
 
     @Value("${upload.basedir}")
     String baseDir;
+
     @Value("${upload.server}")
     String uploadServer;
+
     @Autowired
     BoardImgRepository boardImgRepository;
 
     @Autowired
     ReplyRepository replyRepository;
+
+    @Autowired
+    NestedrReplyRepository nestedrReplyRepository;
     /**게시글 작성*/
     @Transactional
-    public boolean createBoard(String principal, BoardRequest req) throws IOException {
+    public boolean createBoard(String principal, BoardRequest req) throws IOException, boardsExcpiton {
         User user = userRepository.findByEmail(principal);
+        if(req.getBoardRoles()==null || req.getCategory() == null || req.getPostTitle() == null){
+            throw new boardsExcpiton("게시글의 제목,카테고리,열람권한은 필수 입력조건입니다.");
+        }
         Board found = new Board();
         found.setDescription(req.getDescription());
         found.setBoardRoles(req.getBoardRoles());
         found.setCategory(req.getCategory());
         found.setPostTitle(req.getPostTitle());
         found.setWriter(user);
-        ;
         var saved = boardRepository.save(found);
+
         log.warn("=========",saved.getId().toString());
         if (req.getArraches() != null && saved !=null) {
             String emailEncoded = new String(Base64.getEncoder().encode(principal.getBytes()));
@@ -91,17 +97,40 @@ public class BoardService {
 
     /**게시글 수정*/
     @Transactional
-    public boolean boardArraches(String principal, boardArrachesRequest req, passwordRequest pass) throws IOException {
+    public boolean boardArraches(String principal, boardArrachesRequest req) throws IOException, NotBoardException, notCreateUserBoard {
         var user = userRepository.findByEmail(principal);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (passwordEncoder.matches(pass.getPassword(), user.getPassword())) {
-            Board found = new Board();
-            found.setBoardDate(LocalDateTime.now());
-            found.setId(req.getBoardId().getId());
-            found.setDescription(req.getDescription());
+        Board boards =boardRepository.findById(req.getBoardId().getId()).orElseThrow(() -> new NotBoardException("삭제된 게시글입니다."));
+        if(user.getId() != boards.getWriter().getId()){
+            throw new notCreateUserBoard("게시글을 작성한 사용자만 수정할수있습니다.");
+        }
+        Board found = new Board();
+        if(req.getCategory() == null){
+            found.setCategory(boards.getCategory());
+        }else{
             found.setCategory(req.getCategory());
+        }
+
+        if(req.getBoardRoles() == null){
+            found.setBoardRoles(boards.getBoardRoles());
+        }else{
+            found.setBoardRoles(req.getBoardRoles());
+        }
+
+        if(req.getDescription() == null){
+            found.setDescription(null);
+        }else{
+            found.setDescription(req.getDescription());
+        }
+
+        if(req.getPostTitle() == null){
+            found.setPostTitle(boards.getPostTitle());
+        }else{
             found.setPostTitle(req.getPostTitle());
-            found.setWriter(req.getWriter());
+        }
+        found.setBoardDate(LocalDateTime.now());
+            found.setId(req.getBoardId().getId());
+            found.setWriter(user);
+
             var saved = boardRepository.save(found);
             if (req.getArraches() != null) {
                 boardImgRepository.deleteAllByboardId(req.getBoardId());
@@ -129,18 +158,23 @@ public class BoardService {
             }
             return true;
         }
-        return true;
-    }
 
     /**게시글 삭제*/
     @Transactional
-    public void boardDeleteHandle(String principal, passwordRequest pass,boardIdRequest req) {
+    public void boardDeleteHandle(String principal, passwordRequest pass, boardIdRequest req) throws NotBoardException, notCreateUserBoard {
         var user = userRepository.findByEmail(principal);
+       Board board = boardRepository.findById(req.getBoardId().getId()).orElseThrow(() -> new NotBoardException("삭제된 게시글입니다."));
+        var reply =replyRepository.findByBoardId(req.getBoardId().getId());
+        if(!board.getWriter().equals(user)){
+            throw new notCreateUserBoard("게시글을 작성한 사용자만 삭제할수있습니다.");
+        }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (passwordEncoder.matches(pass.getPassword(), user.getPassword())) {
-            replyRepository.deleteAllByBoardId(req.getBoardId());
+            for (Reply replys : reply) {
+                nestedrReplyRepository.deleteAllByreplyId(Optional.ofNullable(replys));
+            }
+            replyRepository.deleteAllByBoardId(req.getBoardId().getId());
             boardImgRepository.deleteAllByboardId(req.getBoardId());
-
             boardRepository.delete(req.getBoardId());
         }
 
@@ -162,16 +196,9 @@ public class BoardService {
 
     /**특정카테고리 전체 가져오기*/
     @Transactional
-    public List<boardsWrapper> readCategoryBoard(categoryRequest req, int page) {
-        if(req.getCategory() != null){
-            List<Board> boardList =  boardRepository.findAllByCategory(req.getCategory());
+    public List<boardsWrapper> readCategoryBoard(categoryRequest req) {
+            List<Board> boardList =  boardRepository.findByCategory(req.getCategory());
             return boardList.stream().map(board -> new boardsWrapper(board)).toList();
-        }else{
-            List<Board> boardList = boardRepository.findAll(PageRequest.of(page-1,5)).toList();
-
-            return boardList.stream().map(board -> new boardsWrapper(board)).toList();
-        }
-
     }
     /**특정 카테고리 글 갯수*/
     @Transactional
@@ -183,12 +210,11 @@ public class BoardService {
      * 특정권한 유저통과시키는 서비스
      */
     @Transactional
-    public List<BoardDetaitWrapper> detailPage(String principal, boardIdRequest req, List<Reply> replts) throws verifyCodeException {
+    public List<BoardDetaitWrapper> detailPage(String principal, detailId req) throws verifyCodeException, NoPermissionException {
         User user = userRepository.findByEmail(principal);
-        log.info("boardId = {}"+req);
-        Optional<Board> board = boardRepository.findById(req.getBoardId().getId());
-        log.warn(board.get().getBoardRoles());
-        board.get().setReplyList(replts);
+        var board = boardRepository.findById(req.getBoardId());
+        log.warn("boardId={}",board.get().getBoardRoles());
+//        log.warn("==",board.get().getBoardRoles());
         if (board.isPresent() && board.get().getBoardRoles().contains("basic")) {
             // basic 권한을 가진 게시판은 모든 사용자가 볼 수 있음
             return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
@@ -197,19 +223,23 @@ public class BoardService {
             if (user.getRoles().contains("master") || user.getRoles().contains("middle")) {
                 return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
             } else {
-                throw new verifyCodeException("게시글을 볼 수 있는 권한이 없습니다.");
+                throw new NoPermissionException("게시글을 볼 수 있는 권한이 없습니다.");
             }
         } else if (board.isPresent() && board.get().getBoardRoles().contains("master")) {
             // master 권한을 가진 게시판은 master 권한을 가진 유저만 볼 수 있음
             if (user.getRoles().contains("master")) {
                 return board.stream().map(boards -> new BoardDetaitWrapper(boards)).toList();
             } else {
-                throw new verifyCodeException("게시글을 볼 수 있는 권한이 없습니다.");
+                throw new NoPermissionException("게시글을 볼 수 있는 권한이 없습니다.");
             }
         } else {
-            throw new verifyCodeException("게시글을 볼 수 있는 권한이 없습니다.");
+            throw new NoPermissionException("게시글을 볼 수 있는 권한이 없습니다.");
         }
     }
 
+    public long boardCount(UserIdRequest req) throws notJoinUserException {
+       User user = userRepository.findById(req.getUserId()).orElseThrow(() -> new notJoinUserException("등록이 안된 유저입니다."));
+        return boardRepository.countBywriter(user);
+    }
 }
 

@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**유저 생성*/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserWrapper {
+public class UserWrapper extends User{
+    private Integer id;
     private String email;
     private String password;
     private @NotNull String name;
@@ -27,12 +27,21 @@ public class UserWrapper {
     private String social;
     private String roles;
 
+
+
+
     public UserWrapper(User req) {
+        this.id = req.getId();
         this.email = req.getEmail();
         this.password = req.getPassword();
         this.name = req.getName();
-        this.roles = "basic";
+        this.profilelmage = req.getProfilelmage();
+        this.joinDate = req.getJoinDate();
+        this.social = req.getSocial();
+        this.roles = req.getRoles();
     }
+
+
 
     @PrePersist
     public void prePersist() {

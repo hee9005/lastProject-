@@ -5,14 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,9 +33,16 @@ public class NestedrReply {
     @JoinColumn(name = "nestedrReplyWriter")
     @ManyToOne(fetch = FetchType.LAZY)
     private User userId;
+
     /**대댓글 내용*/
     private String nestedrReplyContent;
+
     /**대댓글 작성 시간*/
     private LocalDateTime nestedrReplydate;
 
+
+    @PrePersist
+    public void prePersist() {
+        this.nestedrReplydate = LocalDateTime.now();
+    }
 }

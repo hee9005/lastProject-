@@ -30,7 +30,6 @@ public class BoardDetaitWrapper {
         this.writer = board.getWriter();
         this.boardDate = String.valueOf(board.getBoardDate());
 
-        // Modify replyList mapping
         if (board.getReplyList() != null) {
             this.replyList = board.getReplyList().stream().map(ReplyWrapper::new).toList();
         }

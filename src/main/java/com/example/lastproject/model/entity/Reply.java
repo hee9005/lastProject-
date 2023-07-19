@@ -5,7 +5,10 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +21,8 @@ import lombok.*;
 
 @Table(name = "replys")
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reply {
@@ -27,29 +31,20 @@ public class Reply {
     private Integer id;
 
     /**게시판 id*/
-    @JsonIgnoreProperties("boardId")
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "boardId")
-    private Board boardId;
+    @JoinColumn(name = "board_id") // 수정된 부분
+    private Board board;
+
 
     /**댓글 내용*/
     private String comment;
 
     /**댓글 작성자*/
-    @JsonIgnoreProperties("userId")
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid")
-    private User userId;
-
-
-
-
-    public void Reply(Reply reply) {
-        this.boardId= reply.getBoardId();
-        this.userId= reply.getUserId();
-        this.comment = reply.getComment();
-        this.id = reply.getId();
-    }
-
+    private User user;
 
 }
+
