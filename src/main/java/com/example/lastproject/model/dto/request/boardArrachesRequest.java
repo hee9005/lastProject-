@@ -17,8 +17,7 @@ public class boardArrachesRequest {
     private String category;
     private String postTitle;
     private String description;
-    private User Writer;
     private List<MultipartFile> arraches;
-
+    private  String boardRoles;
 
 }

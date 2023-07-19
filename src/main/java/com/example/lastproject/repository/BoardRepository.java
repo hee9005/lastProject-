@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Integer> {
 
-    List<Board> findAllByCategory(String req);
+    List<Board> findByCategory(String req);
 
     long countByCategory(String req);
 
@@ -25,4 +25,6 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
     void deleteById(Board boards);
 
     Optional<Board> findById(Board boardId);
+
+    long countBywriter(User user);
 }

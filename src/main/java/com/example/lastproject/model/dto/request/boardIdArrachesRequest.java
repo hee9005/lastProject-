@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class passwordRequest {
-    private String password;
+public class boardIdArrachesRequest {
+    private Integer boardId;
 
 }

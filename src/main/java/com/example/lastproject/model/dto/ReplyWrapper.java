@@ -1,6 +1,8 @@
 package com.example.lastproject.model.dto;
 
+import com.example.lastproject.model.entity.Board;
 import com.example.lastproject.model.entity.Reply;
+import com.example.lastproject.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,11 +13,14 @@ import lombok.NoArgsConstructor;
 public class ReplyWrapper {
     private Integer id;
     private String comment;
-    private UserWrapper user; // User 정보를 포함하는 래퍼 클래스
+    private Integer boardId; // 대신에 ID 값만 포함
+    private Integer userId; // 대신에 ID 값만 포함
 
     public ReplyWrapper(Reply reply) {
         this.id = reply.getId();
         this.comment = reply.getComment();
-        this.user = new UserWrapper(reply.getUserId()); // User 정보 래핑
+        this.userId = reply.getUser().getId(); // User의 ID 값만 저장
+        this.boardId = reply.getBoard().getId(); // Board의 ID 값만 저장
     }
 }
+

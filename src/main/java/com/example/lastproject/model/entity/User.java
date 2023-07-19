@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,25 +49,22 @@ public class User {
 
     /**가입 날짜*/
     private @NotNull LocalDateTime joinDate;
-
     /**소셜*/
     private String social;
-
     /**권한*/
     private @NotNull String roles;
-
     /**작성 게실글목록*/
     @OneToMany(mappedBy = "writer", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Board> boards;
-
     /**실시간채팅*/
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<chat> chatList;
-
     /**댓글 리스트*/
-    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Reply> replyList;
-
     @PrePersist
     public void prePersist() {
         this.joinDate = LocalDateTime.now();

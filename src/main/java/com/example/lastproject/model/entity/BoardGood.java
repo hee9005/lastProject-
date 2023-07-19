@@ -5,6 +5,7 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,10 +32,12 @@ public class BoardGood {
     /**추천누른 게시글*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardId")
+    @JsonManagedReference
     private Board boardId;
     /**추천누른 유저*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
+    @JsonManagedReference
     private User userId;
 
 }

@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 public class JWTAuthenticationFilter extends OncePerRequestFilter{
     @Autowired
     JwtService jwtService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -33,13 +32,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
         // 사용자가 JWT 토큰을 안 가지고 왔다면
         String authorization = request.getHeader("Authorization");
         log.info("Authorization header value : {}", authorization);
-
         if(authorization == null) {
             log.info("Did not process authentication request since failed to find authorization header", authorization);
             filterChain.doFilter(request, response);	// 통과 시켜주면 됨.
             return;
         }
-
         try {
             // JWT 유효성 검사 해서 통과하면
             String email = jwtService.verifyToken(authorization);	//
@@ -61,9 +58,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
             log.error("Verify token fail. {}", e.getMessage());
             throw new BadCredentialsException("Invalid authentication token");
         }
-
-
-
         filterChain.doFilter(request, response);
     }
 

@@ -5,8 +5,10 @@
 
 package com.example.lastproject.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -43,7 +45,7 @@ public class Board {
     private @NotNull String postTitle;
     /**게시글내용*/
     private String description;
-    
+
     @NotNull
     /**게시판 열람등급*/
     private String boardRoles;
@@ -53,6 +55,7 @@ public class Board {
     /**게시글 작성자id*/
     @JoinColumn(name = "writer")
     @NotNull
+    @JsonManagedReference
     private  User writer;
     @NotNull
     /**게시글 작성날짜*/
@@ -60,11 +63,13 @@ public class Board {
     /**게시글 이미지*/
     @OneToMany(mappedBy = "boardId")
     @JsonIgnore
+    @JsonBackReference
     private List<BoardImg> boardImg;
 
     /**댓글*/
+    @OneToMany(mappedBy = "board")
     @JsonIgnore
-    @OneToMany(mappedBy = "boardId")
+    @JsonBackReference
     private List<Reply> replyList;
 
     /**추천*/
