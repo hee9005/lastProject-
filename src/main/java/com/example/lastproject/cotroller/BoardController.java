@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@Tag(name = "대댓글" , description = "대댓들에 관련된 api입니다.")
+@Tag(name = "게시글" , description = "게시글들에 관련된 api입니다.")
 @RestController
 @RequestMapping({"/board"})
 @Slf4j
@@ -55,7 +55,6 @@ public class BoardController {
     @PostMapping({"/private/create"})
     public ResponseEntity<?> createBoard(@AuthenticationPrincipal String principal, BoardRequest req) throws IOException, boardsExcpiton {
         boolean ref =boardService.createBoard(principal, req);
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
